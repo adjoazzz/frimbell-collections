@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Frimbell Collections | Occasion Wear</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<style>
+  :root {
+    --ink: #1a1212;
+    --muted: #5c5252;
+    --paper: #f7f4f1;
+    --card: #f1eeeb;
+    --line: #e3dcd6;
+    --red: #b3202a;
+    --accent: #e9d8a6;
+    --accent-ink: #2a1a14;
+    --nav-h: 72px;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Inter Tight", system-ui, sans-serif;
+    font-size: 18px;             /* larger base size for easy reading */
+    line-height: 1.55;
+    color: var(--ink);
+    background: #fff;
+  }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+
+  .btn-dark {
+    display: inline-block;
+    padding: 16px 36px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    border: 0;
+    cursor: pointer;
+    transition: background .2s ease;
+  }
+  .btn-dark:hover { background: #3a2a2a; }
+
+  .btn-line {
+    display: inline-block;
+    padding: 12px 26px;
+    border: 1.5px solid var(--ink);
+    border-radius: 999px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    background: transparent;
+    cursor: pointer;
+    transition: background .2s ease, color .2s ease;
+  }
+  .btn-line:hover { background: var(--ink); color: #fff; }
+
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+  /* =========================================================
+     NAV + HERO
+  ========================================================= */
+  .nav {
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: var(--nav-h);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--gutter);
+    z-index: 10;
+    font-size: 16px;
+    color: #fff;
+  }
+  .nav .logo { font-weight: 600; font-size: 22px; letter-spacing: -0.01em; text-decoration: none; }
+  .nav ul { display: flex; gap: 32px; list-style: none; }
+  .nav a { text-decoration: none; }
+  .nav a:hover { opacity: .7; }
+  .nav .actions { display: flex; gap: 22px; }
+
+  .hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    height: 100svh;
+    min-height: 560px;
+    overflow: hidden;
+    color: #fff;
+    background: #2a1a1a;
+  }
+  .hero .panel { position: relative; overflow: hidden; }
+  .hero .panel img { width: 100%; height: 100%; object-fit: cover; }
+  .panel.left img  { object-position: 50% 18%; }
+  .panel.right img { object-position: 50% 20%; }
+  .hero::after {
+    content: "";
+    position: absolute; inset: 0; pointer-events: none;
+    background:
+      linear-gradient(to bottom, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 22%),
+      radial-gradient(ellipse 60% 38% at 50% 62%, rgba(20,8,8,.55), rgba(20,8,8,0) 70%);
+  }
+  .hero .copy {
+    position: absolute; left: 50%; top: 62%;
+    transform: translate(-50%, -50%);
+    width: min(92%, 980px);
+    text-align: center; z-index: 5;
+  }
+  .hero h1 {
+    font-weight: 500;
+    font-size: clamp(2.2rem, 6.4vw, 5.6rem);
+    line-height: 1;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    text-shadow: 0 2px 24px rgba(0,0,0,.25);
+  }
+  .hero .copy p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: clamp(12px, 1.1vw, 14px);
+    line-height: 1.6;
+    max-width: 38ch;
+    margin: clamp(16px, 2.4vw, 28px) auto 0;
+  }
+  .hero .btn {
+    display: inline-block;
+    margin-top: clamp(18px, 2.4vw, 28px);
+    padding: 15px 36px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-size: 13px; font-weight: 600;
+    letter-spacing: .12em; text-transform: uppercase;
+    text-decoration: none;
+    transition: transform .2s ease, background .2s ease;
+  }
+  .hero .btn:hover { transform: translateY(-2px); background: #f2e6bd; }
+
+  /* =========================================================
+     NEW ARRIVALS (product row)
+  ========================================================= */
+  .products {
+    padding: clamp(40px, 6vw, 80px) var(--gutter) clamp(32px, 4vw, 56px);
+    position: relative;
+  }
+  .section-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 16px; margin-bottom: 28px;
+  }
+  .section-head h2 {
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    font-weight: 500; letter-spacing: -0.02em;
+  }
+  .section-head a { font-size: 16px; }
+
+  .track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(240px, calc((100% - 3 * 20px) / 4));
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: 18px;
+    scrollbar-width: thin;
+    scrollbar-color: var(--ink) var(--line);
+  }
+  .card { scroll-snap-align: start; display: flex; flex-direction: column; }
+  .card .photo {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: var(--card);
+    overflow: hidden;
+  }
+  .card .photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+  .card:hover .photo img { transform: scale(1.03); }
+  .tag {
+    position: absolute; top: 12px; left: 12px;
+    background: var(--ink); color: #fff;
+    font-size: 12px; letter-spacing: .06em; text-transform: uppercase;
+    padding: 5px 10px;
+  }
+  .heart {
+    position: absolute; top: 10px; right: 10px;
+    width: 44px; height: 44px; border: 0; border-radius: 50%;
+    background: rgba(255,255,255,.85);
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .heart svg { width: 22px; height: 22px; fill: none; stroke: var(--ink); stroke-width: 1.8; }
+  .heart[aria-pressed="true"] svg { fill: var(--red); stroke: var(--red); }
+
+  .card .info { padding-top: 14px; }
+  .card h3 { font-size: 18px; font-weight: 500; line-height: 1.3; }
+  .card .desc { font-size: 15px; color: var(--muted); margin-top: 2px; }
+  .card .row {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; margin-top: 12px;
+  }
+  .price { font-size: 19px; font-weight: 600; }
+  .add {
+    padding: 10px 18px; font-size: 15px; font-weight: 500;
+    background: #fff; border: 1.5px solid var(--ink); cursor: pointer;
+    transition: background .2s, color .2s;
+  }
+  .add:hover { background: var(--ink); color: #fff; }
+
+  .arrow {
+    position: absolute; right: calc(var(--gutter) - 8px); top: 42%;
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1.5px solid var(--ink); background: #fff; cursor: pointer;
+    display: grid; place-items: center; z-index: 2;
+  }
+  .arrow svg { width: 22px; height: 22px; stroke: var(--ink); fill: none; stroke-width: 2; }
+  .arrow.prev { right: auto; left: calc(var(--gutter) - 8px); }
+  .arrow.prev svg { transform: rotate(180deg); }
+
+  /* =========================================================
+     SHOP AGAIN (tilted photo collage)
+  ========================================================= */
+  .collage {
+    background: var(--paper);
+    padding: clamp(56px, 8vw, 110px) var(--gutter);
+    text-align: center;
+    overflow: hidden;
+  }
+  .polaroids {
+    display: flex; justify-content: center; align-items: center;
+    gap: clamp(8px, 2.5vw, 32px);
+    max-width: 1100px; margin: 0 auto;
+  }
+  .polaroid {
+    flex: 1 1 0; max-width: 340px;
+    background: #fff; padding: 10px;
+    box-shadow: 0 10px 30px rgba(40,20,20,.15);
+  }
+  .polaroid img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: var(--card); }
+  .polaroid:nth-child(1) { transform: rotate(-4deg); }
+  .polaroid:nth-child(2) { transform: rotate(2deg) translateY(-14px); }
+  .polaroid:nth-child(3) { transform: rotate(5deg); }
+
+  .collage p {
+    max-width: 52ch; margin: clamp(32px, 5vw, 56px) auto 0;
+    font-size: 19px; line-height: 1.65;
+  }
+  .collage .btn-dark { margin-top: 28px; }
+
+  /* =========================================================
+     ABOUT (side nav + big image)
+  ========================================================= */
+  .about {
+    display: grid;
+    grid-template-columns: minmax(260px, 340px) 1fr;
+    gap: clamp(16px, 3vw, 40px);
+    padding: clamp(24px, 3vw, 40px) var(--gutter);
+    min-height: 100svh;
+    background: #fff;
+  }
+  .about aside {
+    display: flex; flex-direction: column; justify-content: space-between;
+    gap: 40px; padding: 8px 0 8px;
+  }
+  .about .side-logo { font-size: 24px; font-weight: 600; text-decoration: none; letter-spacing: -0.01em; }
+  .about nav ul { list-style: none; margin-top: 18px; }
+  .about nav li { margin-bottom: 4px; }
+  .about nav a {
+    text-decoration: none; font-size: 17px; font-weight: 500;
+    display: inline-block; padding: 4px 0;
+  }
+  .about nav a:hover, .about nav a[aria-current="true"] { text-decoration: underline; text-underline-offset: 5px; }
+
+  .about h2 {
+    font-size: clamp(2rem, 3.6vw, 3rem);
+    font-weight: 600; line-height: 1.05; letter-spacing: -0.03em;
+  }
+  .about .blurb { margin-top: 16px; font-size: 18px; color: var(--muted); max-width: 32ch; }
+  .about .btns { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+
+  .about .figure {
+    position: relative; border-radius: 22px; overflow: hidden;
+    background: var(--card); min-height: 520px;
+  }
+  .about .figure img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 20%; position: absolute; inset: 0; }
+  .about .pill {
+    position: absolute; top: 18px; right: 18px; z-index: 2;
+    background: rgba(255,255,255,.92); border-radius: 999px;
+    padding: 8px 18px; font-size: 15px;
+  }
+  .about .feature {
+    position: absolute; right: 24px; bottom: 24px; z-index: 2;
+    display: flex; gap: 14px; align-items: center;
+    background: #fff; border-radius: 16px; padding: 12px 18px 12px 12px;
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    max-width: 340px;
+  }
+  .about .feature img { position: static; width: 64px; height: 80px; object-fit: cover; border-radius: 8px; background: var(--card); }
+  .about .feature b { display: block; font-weight: 600; }
+  .about .feature span { font-size: 15px; color: var(--muted); }
+
+  /* =========================================================
+     FOOTER (image + floating card)
+  ========================================================= */
+  .footer {
+    position: relative;
+    padding: clamp(80px, 12vw, 160px) var(--gutter) clamp(24px, 3vw, 40px);
+    color: #fff;
+    background: #3a2222 url("footer-bg.jpg") center / cover no-repeat;
+  }
+  .footer::before {
+    content: ""; position: absolute; inset: 0; background: rgba(20,8,8,.35);
+  }
+  .footer > * { position: relative; }
+  .footer .cta { text-align: center; margin-bottom: clamp(40px, 6vw, 80px); }
+  .footer .cta h2 { font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 500; letter-spacing: -0.02em; }
+  .footer .cta p { margin-top: 8px; font-size: 18px; opacity: .92; }
+  .footer .cta .pills { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; }
+  .footer .cta .pills a {
+    padding: 13px 28px; border-radius: 999px; font-size: 16px; text-decoration: none;
+    border: 1.5px solid rgba(255,255,255,.7);
+  }
+  .footer .cta .pills a:first-child { background: #fff; color: var(--ink); border-color: #fff; }
+
+  .foot-card {
+    background: rgba(255,255,255,.96);
+    color: var(--ink);
+    border-radius: 14px;
+    padding: clamp(24px, 3.5vw, 44px);
+    display: grid;
+    grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    gap: 32px;
+  }
+  .foot-card .brand { font-size: 24px; font-weight: 600; }
+  .foot-card .brand-text { margin-top: 12px; font-size: 16px; color: var(--muted); max-width: 36ch; }
+  .foot-card .social { display: flex; gap: 18px; margin-top: 20px; font-size: 15px; font-weight: 500; }
+  .foot-card h4 { font-size: 15px; font-weight: 500; color: var(--muted); margin-bottom: 14px; }
+  .foot-card ul { list-style: none; }
+  .foot-card li { margin-bottom: 10px; }
+  .foot-card li a { text-decoration: none; font-size: 17px; }
+  .foot-card li a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .copyright { margin-top: 20px; text-align: center; font-size: 14px; opacity: .85; }
+
+  /* =========================================================
+     RESPONSIVE
+  ========================================================= */
+  @media (max-width: 900px) {
+    .about { grid-template-columns: 1fr; }
+    .about aside { gap: 28px; }
+    .about nav ul { display: flex; flex-wrap: wrap; gap: 4px 22px; }
+    .about .figure { min-height: 460px; }
+    .foot-card { grid-template-columns: 1fr 1fr; }
+    .foot-card > div:first-child { grid-column: 1 / -1; }
+    .track { grid-auto-columns: minmax(220px, 44%); }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+    .nav ul { display: none; }
+    .hero { height: 92svh; }
+    .hero .copy { top: 66%; }
+    .hero h1 { font-size: clamp(2rem, 10vw, 3rem); }
+    .hero .copy p { max-width: 30ch; }
+    .track { grid-auto-columns: 72%; }
+    .arrow { display: none; }
+    .polaroids { gap: 6px; }
+    .polaroid { padding: 5px; }
+    .polaroid:nth-child(2) { transform: rotate(2deg) translateY(-8px); }
+    .about .feature { left: 16px; right: 16px; bottom: 16px; max-width: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  /* wordmark (text version of the storefront logo) */
+  .wm { display: inline-flex; align-items: baseline; gap: .3em; white-space: nowrap; }
+  .wm b { font-weight: 700; letter-spacing: .03em; }
+  .wm i { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-weight: 500; font-size: .92em; }
+
+  /* hero: brand name + tagline */
+  .hero .hero-name {
+    font-size: clamp(2.6rem, 9vw, 7.5rem);
+    line-height: 1;
+    letter-spacing: 0;
+    text-shadow: 0 2px 30px rgba(0,0,0,.35);
+  }
+  .hero .hero-name .wm { white-space: nowrap; flex-wrap: nowrap; justify-content: flex-start; }
+  .hero .hero-name .wm b { letter-spacing: .04em; }
+  .hero .copy p.tagline {
+    font-family: "Playfair Display", Georgia, serif;
+    font-style: italic;
+    font-size: clamp(1.25rem, 2.4vw, 2rem);
+    line-height: 1.3;
+    max-width: none;
+    margin: clamp(10px, 1.6vw, 20px) auto 0;
+    text-shadow: 0 2px 20px rgba(0,0,0,.35);
+  }
+
+  .foot-card .contact { margin-top: 18px; font-size: 16px; line-height: 1.7; color: var(--muted); max-width: 36ch; }
+  .foot-card .contact a { color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .foot-card .contact a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* footer: soft, blurred photo behind the card */
+  .footer { background: #3a2222; overflow: hidden; }
+  .footer::before {
+    inset: -24px;
+    background: linear-gradient(rgba(20,8,8,.5), rgba(20,8,8,.6)), url("footer-bg.jpg") center / cover no-repeat;
+    filter: blur(7px);
+  }
+
+  /* =========================================================
+     FIND A SHOP
+  ========================================================= */
+  .leaflet-container { font-family: inherit; }
+  .stores { background: var(--paper); padding: clamp(56px, 8vw, 110px) var(--gutter); }
+  .stores-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: minmax(300px, 460px) 1fr;
+    gap: clamp(24px, 4vw, 56px); align-items: start;
+  }
+  .stores h2 { font-size: clamp(1.9rem, 3.4vw, 2.8rem); font-weight: 500; letter-spacing: -0.025em; line-height: 1.08; }
+  .stores-lead { margin-top: 10px; color: var(--muted); }
+  .locate { margin-top: 24px; width: 100%; padding: 18px 24px; font-size: 17px; }
+  .locate:disabled { opacity: .6; cursor: wait; }
+  .area { margin-top: 22px; }
+  .area label { display: block; font-weight: 600; font-size: 16px; margin-bottom: 8px; }
+  .area-row { display: flex; gap: 10px; }
+  .area-row input {
+    flex: 1; min-width: 0; height: 52px; padding: 0 16px;
+    font: inherit; font-size: 17px; border: 1.5px solid var(--ink); background: #fff; border-radius: 0;
+  }
+  .area-row .btn-line { border-radius: 0; height: 52px; padding: 0 22px; }
+  .status { margin-top: 18px; min-height: 1.6em; font-size: 17px; font-weight: 500; }
+  .status.error { color: var(--red); }
+
+  .shop-list { list-style: none; margin-top: 14px; display: grid; gap: 12px; }
+  .shop {
+    background: #fff; border: 1.5px solid var(--line); padding: 18px; cursor: pointer;
+    transition: border-color .2s;
+  }
+  .shop:hover, .shop:focus-visible { border-color: var(--ink); }
+  .shop.nearest { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink) inset; }
+  .shop .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .shop .chips:not(:empty) { margin-bottom: 8px; }
+  .chip {
+    display: inline-block; font-size: 13px; font-weight: 600; letter-spacing: .04em;
+    text-transform: uppercase; padding: 4px 10px; background: var(--ink); color: #fff;
+  }
+  .chip.light { background: var(--card); color: var(--muted); }
+  .shop h3 { font-size: 19px; font-weight: 600; line-height: 1.25; }
+  .shop .addr { color: var(--muted); font-size: 16px; margin-top: 4px; }
+  .shop .dist { font-weight: 600; font-size: 17px; margin-top: 8px; }
+  .shop .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; }
+  .shop .actions a, .shop .actions button {
+    font: inherit; font-size: 15px; padding: 10px 18px; border: 1.5px solid var(--ink);
+    background: #fff; color: var(--ink); border-radius: 999px; text-decoration: none; cursor: pointer;
+  }
+  .shop .actions a.primary { background: var(--ink); color: #fff; }
+  .shop .actions a:hover, .shop .actions button:hover { background: var(--ink); color: #fff; }
+
+  .map-wrap { position: sticky; top: 24px; }
+  #map { height: min(72vh, 640px); min-height: 420px; border-radius: 22px; overflow: hidden; background: var(--card); z-index: 0; }
+  .map-fallback { padding: 24px; color: var(--muted); }
+  .pin {
+    display: block; width: 34px; height: 34px; border-radius: 50% 50% 50% 0;
+    background: var(--red); transform: rotate(-45deg); border: 3px solid #fff;
+    box-shadow: 0 4px 12px rgba(0,0,0,.3); position: relative;
+  }
+  .pin::after { content: ""; position: absolute; inset: 8px; border-radius: 50%; background: #fff; }
+  .pin.nearest { background: var(--ink); }
+  .you {
+    display: block; width: 20px; height: 20px; border-radius: 50%;
+    background: #2563eb; border: 3px solid #fff; box-shadow: 0 0 0 6px rgba(37,99,235,.25);
+  }
+  .stores-panel { min-width: 0; }
+  .area-row input { width: 100%; }
+  @media (max-width: 900px) {
+    .stores-inner { grid-template-columns: minmax(0, 1fr); }
+    .map-wrap { position: static; }
+  }
+
+  /* hero copy: bottom-left */
+  .hero .copy {
+    left: var(--gutter); right: auto; top: auto;
+    bottom: clamp(36px, 8vh, 88px);
+    transform: none;
+    width: min(calc(100% - 2 * var(--gutter)), 1000px);
+    text-align: left;
+  }
+  .hero .hero-name { font-size: clamp(1.7rem, 7.6vw, 5rem); }
+  .hero .hero-name .wm { justify-content: flex-start; }
+  .hero .copy p.tagline { margin-left: 0; margin-right: 0; }
+  .hero::after {
+    background:
+      linear-gradient(to top, rgba(20,8,8,.72) 0%, rgba(20,8,8,.38) 35%, rgba(20,8,8,0) 62%),
+      linear-gradient(to bottom, rgba(0,0,0,.28) 0%, rgba(0,0,0,0) 22%);
+  }
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+  <!-- ================= HERO ================= -->
+  <header class="nav">
+    <a class="logo" href="#"><span class="wm"><b>FRIMBELL</b><i>Collections</i></span></a>
+    <ul>
+      <li><a href="#new">New In</a></li>
+      <li><a href="product.html">Shop</a></li>
+      <li><a href="#stores">Find a shop</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="actions">
+      <a href="#" data-bag>Bag (<span data-bag-count>0</span>)</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="panel left"><img src="hero-left.jpg" alt="Model in a red beaded gown with sheer cape sleeves"></div>
+    <div class="panel right"><img src="hero-right.jpg" alt="Model in a pink embellished gown with a bow shoulder"></div>
+    <div class="copy">
+      <h1 class="hero-name"><span class="wm"><b>FRIMBELL</b><i>Collections</i></span></h1>
+      <p class="tagline">Where luxury meets your needs</p>
+      <a class="btn" href="#new">Shop the collection</a>
+    </div>
+  </section>
+
+  <!-- ================= PRODUCT ROW ================= -->
+  <section class="products" id="new" aria-labelledby="new-title">
+    <div class="section-head">
+      <h2 id="new-title">New arrivals</h2>
+      <a href="#">View all</a>
+    </div>
+
+    <button class="arrow prev" aria-label="Previous pieces"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    <button class="arrow next" aria-label="Next pieces"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+
+    <div class="track" id="track" tabindex="0" aria-label="New arrivals">
+      <article class="card" data-id="beaded-mermaid-gown">
+        <div class="photo">
+          <span class="tag">New</span>
+          <button class="heart" aria-label="Save to wishlist" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5.5 6.2 5.5c2 0 3.2 1.1 3.8 2.2.6-1.1 1.8-2.2 3.8-2.2 3.2 0 5 3.1 3.7 6.3C19.5 16.4 12 21 12 21z"/></svg></button>
+          <img src="product-1.jpg" alt="Red beaded gown with cape sleeves" loading="lazy">
+        </div>
+        <div class="info">
+          <h3>Beaded Mermaid Gown</h3>
+          <p class="desc">Stretch satin, beaded tulle cape sleeves</p>
+          <div class="row"><span class="price">GH₵ 2,450<span class="was">GH₵ 2,900</span></span><button class="add" type="button">Add to bag</button></div>
+        </div>
+      </article>
+
+      <article class="card" data-id="blush-bow-lace-gown">
+        <div class="photo">
+          <span class="tag">Best seller</span>
+          <button class="heart" aria-label="Save to wishlist" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5.5 6.2 5.5c2 0 3.2 1.1 3.8 2.2.6-1.1 1.8-2.2 3.8-2.2 3.2 0 5 3.1 3.7 6.3C19.5 16.4 12 21 12 21z"/></svg></button>
+          <img src="product-2.jpg" alt="Pink beaded gown with a bow shoulder" loading="lazy">
+        </div>
+        <div class="info">
+          <h3>Blush Bow Lace Gown</h3>
+          <p class="desc">Beaded lace with a sculpted bow shoulder</p>
+          <div class="row"><span class="price">GH₵ 2,150</span><button class="add" type="button">Add to bag</button></div>
+        </div>
+      </article>
+
+      <article class="card" data-id="rose-pearl-evening-gown">
+        <div class="photo">
+          <button class="heart" aria-label="Save to wishlist" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5.5 6.2 5.5c2 0 3.2 1.1 3.8 2.2.6-1.1 1.8-2.2 3.8-2.2 3.2 0 5 3.1 3.7 6.3C19.5 16.4 12 21 12 21z"/></svg></button>
+          <img src="product-3.jpg" alt="Rose lace gown with pearls" loading="lazy">
+        </div>
+        <div class="info">
+          <h3>Rose Pearl Evening Gown</h3>
+          <p class="desc">Pearl-beaded lace with sheer sleeves</p>
+          <div class="row"><span class="price">GH₵ 1,980</span><button class="add" type="button">Add to bag</button></div>
+        </div>
+      </article>
+
+      <article class="card" data-id="crimson-crystal-gown">
+        <div class="photo">
+          <span class="tag sale">Sale</span>
+          <button class="heart" aria-label="Save to wishlist" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5.5 6.2 5.5c2 0 3.2 1.1 3.8 2.2.6-1.1 1.8-2.2 3.8-2.2 3.2 0 5 3.1 3.7 6.3C19.5 16.4 12 21 12 21z"/></svg></button>
+          <img src="product-4.jpg" alt="Red gown with a crystal neckline" loading="lazy">
+        </div>
+        <div class="info">
+          <h3>Crimson Crystal Gown</h3>
+          <p class="desc">Crystal neckline and ruffled cuffs</p>
+          <div class="row"><span class="price">GH₵ 2,750<span class="was">GH₵ 3,200</span></span><button class="add" type="button">Add to bag</button></div>
+        </div>
+      </article>
+
+      <article class="card" data-id="blush-gown-clutch-set">
+        <div class="photo">
+          <span class="tag">Set</span>
+          <button class="heart" aria-label="Save to wishlist" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5.5 6.2 5.5c2 0 3.2 1.1 3.8 2.2.6-1.1 1.8-2.2 3.8-2.2 3.2 0 5 3.1 3.7 6.3C19.5 16.4 12 21 12 21z"/></svg></button>
+          <img src="product-5.jpg" alt="Blush gown with a crystal bow clutch" loading="lazy">
+        </div>
+        <div class="info">
+          <h3>Blush Gown &amp; Bow Clutch Set</h3>
+          <p class="desc">Gown with a matching crystal bow clutch</p>
+          <div class="row"><span class="price">GH₵ 2,600</span><button class="add" type="button">Add to bag</button></div>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- ================= SHOP AGAIN COLLAGE ================= -->
+  <section class="collage" id="collections">
+    <div class="polaroids">
+      <figure class="polaroid"><img src="collage-1.jpg" alt="Pink beaded gown, close-up" loading="lazy"></figure>
+      <figure class="polaroid"><img src="collage-2.jpg" alt="Red beaded gown, back view" loading="lazy"></figure>
+      <figure class="polaroid"><img src="collage-3.jpg" alt="Pink gown with gold and marble details" loading="lazy"></figure>
+    </div>
+    <p>Every piece is cut and finished with care, so you can walk into any room feeling like yourself. Find the one that is made for your next occasion.</p>
+    <a class="btn-dark" href="#new">Continue shopping</a>
+  </section>
+
+  <!-- ================= ABOUT ================= -->
+  <section class="about" id="about" aria-labelledby="about-title">
+    <aside>
+      <div>
+        <a class="side-logo" href="#"><span class="wm"><b>FRIMBELL</b><i>Collections</i></span></a>
+        <nav aria-label="About sections">
+          <ul>
+            <li><a href="#about" aria-current="true">Our story</a></li>
+            <li><a href="#about">Craftsmanship</a></li>
+            <li><a href="#about">Fabrics</a></li>
+            <li><a href="#about">Fit &amp; sizing</a></li>
+            <li><a href="#about">Custom orders</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div>
+        <h2 id="about-title">Elegant pieces, made with you in mind.</h2>
+        <p class="blurb">We design occasion wear for women who know what suits them. Rich fabrics, careful finishing and a fit that feels as good as it looks.</p>
+        <div class="btns">
+          <a class="btn-line" href="#">Our story</a>
+          <a class="btn-line" href="#new">Shop now</a>
+        </div>
+      </div>
+    </aside>
+
+    <div class="figure">
+      <img src="about.jpg" alt="Model in a pink beaded gown in front of a gold mirror">
+      <span class="pill">Made to measure in Accra</span>
+      <a class="feature" href="product.html?id=beaded-mermaid-gown" style="text-decoration:none;color:inherit">
+        <img src="product-1.jpg" alt="Red beaded gown with cape sleeves">
+        <div><b>Featured: Beaded Mermaid Gown</b><span>GH₵ 2,450 · Made to order in 5 to 7 days</span></div>
+      </a>
+    </div>
+  </section>
+
+  <!-- ================= FIND A SHOP ================= -->
+  <section class="stores" id="stores" aria-labelledby="stores-title">
+    <div class="stores-inner">
+      <div class="stores-panel">
+        <h2 id="stores-title">Find a shop near you</h2>
+        <p class="stores-lead">Come in, try on our pieces and get the perfect fit.</p>
+
+        <button class="btn-dark locate" id="locate" type="button">Use my location</button>
+
+        <form class="area" id="area-form">
+          <label for="area">Or type your area</label>
+          <div class="area-row">
+            <input id="area" name="area" type="text" placeholder="e.g. Osu, Kumasi, Tema" autocomplete="off">
+            <button class="btn-line" type="submit">Search</button>
+          </div>
+        </form>
+
+        <p class="status" id="status" role="status" aria-live="polite"></p>
+        <ol class="shop-list" id="shop-list"></ol>
+      </div>
+
+      <div class="map-wrap">
+        <div id="map" role="region" aria-label="Map of our shops"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer" id="contact">
+    <div class="cta">
+      <h2>Come and say hello</h2>
+      <p>Questions about sizing or a custom piece? We are happy to help.</p>
+      <div class="pills">
+        <a href="https://www.instagram.com/frimbell_luxury_collections/" target="_blank" rel="noopener">Our Instagram</a>
+        <a href="https://wa.me/233244665883?text=Hello%20Frimbell%20Collections%2C%20I%20would%20like%20to%20ask%20about%20an%20order." target="_blank" rel="noopener">Chat on WhatsApp</a>
+        <a href="tel:+233244665883">Call 024 466 5883</a>
+      </div>
+    </div>
+
+    <div class="foot-card">
+      <div>
+        <div class="brand"><span class="wm"><b>FRIMBELL</b><i>Collections</i></span></div>
+        <p class="brand-text">Elegant occasion wear for women who love to look and feel their best.</p>
+        <div class="social"><a href="https://www.instagram.com/frimbell_luxury_collections/" target="_blank" rel="noopener">Instagram</a><a href="https://wa.me/233244665883?text=Hello%20Frimbell%20Collections%2C%20I%20would%20like%20to%20ask%20about%20an%20order." target="_blank" rel="noopener">WhatsApp</a></div>
+        <p class="contact">Dansoman first roundabout, opposite Absa Bank, Accra, Ghana<br><a href="tel:+233244665883">024 466 5883</a> · <a href="tel:+233533062065">053 306 2065</a> · <a href="tel:+233500625824">050 062 5824</a></p>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <ul><li><a href="#new">New in</a></li><li><a href="#">Gowns</a></li><li><a href="#">Two-piece sets</a></li><li><a href="#">Accessories</a></li></ul>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <ul><li><a href="#about">About us</a></li><li><a href="#">Custom orders</a></li><li><a href="#stores">Showroom</a></li></ul>
+      </div>
+      <div>
+        <h4>Help</h4>
+        <ul><li><a href="#">Size guide</a></li><li><a href="#">Delivery</a></li><li><a href="#">Returns</a></li><li><a href="#">Contact us</a></li></ul>
+      </div>
+    </div>
+    <p class="copyright">&copy; 2026 Frimbell Collections. All rights reserved.</p>
+  </footer>
+
+<script>
+  // product row arrows
+  const track = document.getElementById('track');
+  const step = () => track.querySelector('.card').getBoundingClientRect().width + 20;
+  document.querySelector('.arrow.next').addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+  document.querySelector('.arrow.prev').addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+
+  // open the product page from a card (photo or name)
+  document.querySelectorAll('.card .photo, .card h3').forEach(el => {
+    el.style.cursor = 'pointer';
+    el.addEventListener('click', e => {
+      if (e.target.closest('.heart')) return;
+      window.location.href = 'product.html?id=' + e.target.closest('.card').dataset.id;
+    });
+  });
+
+  // wishlist hearts
+  document.querySelectorAll('.heart').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const on = btn.getAttribute('aria-pressed') === 'true';
+      btn.setAttribute('aria-pressed', String(!on));
+    });
+  });
+</script>
+<script>
+  // hide any photo that is not in the folder yet, so there are no broken-image icons
+  document.querySelectorAll('img').forEach(img => {
+    const hide = () => {
+      img.style.visibility = 'hidden';
+      const t = img.closest('.thumbs button'); if (t) t.hidden = true;
+    };
+    if (img.complete && img.naturalWidth === 0) hide();
+    img.addEventListener('error', hide);
+  });
+</script>
+<script src="vendor/leaflet/leaflet.js"></script>
+<script>
+(function () {
+  // ===== Shops. Edit this list to add or change branches. =====
+  var SHOW_DEMO_BRANCHES = true;   // set to false before sending to the client
+  var SHOPS = [
+    {
+      id: 'dansoman',
+      name: 'Frimbell Collections, Dansoman',
+      address: 'Dansoman first roundabout, opposite Absa Bank, Accra, Ghana',
+      lat: 5.5468, lng: -0.2657,   // approximate, replace with the exact pin
+      phone: '+233244665883', phoneLabel: '024 466 5883',
+      directions: 'https://www.google.com/maps/search/?api=1&query=' +
+        encodeURIComponent('Frimbell Collections Dansoman first roundabout opposite Absa Bank Accra Ghana')
+    },
+    { id: 'demo-east-legon', demo: true, name: 'East Legon', address: 'Sample branch, shown for the demo', lat: 5.6350, lng: -0.1530 },
+    { id: 'demo-kumasi', demo: true, name: 'Adum, Kumasi', address: 'Sample branch, shown for the demo', lat: 6.6885, lng: -1.6244 }
+  ];
+
+  var shops = SHOPS.filter(function (s) { return SHOW_DEMO_BRANCHES || !s.demo; });
+  var listEl = document.getElementById('shop-list');
+  var statusEl = document.getElementById('status');
+  var locateBtn = document.getElementById('locate');
+  var form = document.getElementById('area-form');
+  var input = document.getElementById('area');
+  var map = null, markers = {}, youMarker = null;
+
+  function dirUrl(s) { return s.directions || ('https://www.google.com/maps/dir/?api=1&destination=' + s.lat + ',' + s.lng); }
+  function toRad(x) { return x * Math.PI / 180; }
+  function km(a, b) {
+    var R = 6371, dLat = toRad(b.lat - a.lat), dLng = toRad(b.lng - a.lng);
+    var h = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos(toRad(a.lat)) * Math.cos(toRad(b.lat)) * Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return 2 * R * Math.asin(Math.sqrt(h));
+  }
+  function fmt(d) { return d < 1 ? 'less than 1 km' : (d < 10 ? d.toFixed(1) + ' km' : Math.round(d) + ' km'); }
+  function say(msg, isError) { statusEl.textContent = msg; statusEl.classList.toggle('error', !!isError); }
+
+  function pinIcon(nearest) {
+    return L.divIcon({ className: '', html: '<span class="pin' + (nearest ? ' nearest' : '') + '"></span>',
+      iconSize: [34, 34], iconAnchor: [17, 40], popupAnchor: [0, -40] });
+  }
+  var youIcon = window.L ? L.divIcon({ className: '', html: '<span class="you"></span>', iconSize: [20, 20], iconAnchor: [10, 10] }) : null;
+
+  function initMap() {
+    var el = document.getElementById('map');
+    if (!window.L) { el.innerHTML = '<p class="map-fallback">The map could not load. The list of shops still works.</p>'; return; }
+    map = L.map('map', { scrollWheelZoom: false, dragging: !L.Browser.mobile, tap: !L.Browser.mobile });
+    var esri = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
+      attribution: 'Tiles &copy; Esri', maxZoom: 19
+    }).addTo(map);
+    var failed = 0, swapped = false;
+    esri.on('tileerror', function () {
+      failed++;
+      if (failed > 3 && !swapped) {
+        swapped = true; map.removeLayer(esri);
+        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+        }).addTo(map);
+      }
+    });
+    shops.forEach(function (s) {
+      markers[s.id] = L.marker([s.lat, s.lng], { icon: pinIcon(false), title: s.name })
+        .addTo(map).bindPopup('<strong>' + s.name + '</strong><br>' + s.address);
+    });
+    if (shops.length > 1) map.fitBounds(shops.map(function (s) { return [s.lat, s.lng]; }), { padding: [60, 60] });
+    else map.setView([shops[0].lat, shops[0].lng], 15);
+  }
+
+  function markNearest(id) {
+    Object.keys(markers).forEach(function (k) { markers[k].setIcon(pinIcon(k === id)); });
+  }
+
+  function render(origin) {
+    var items = shops.map(function (s) {
+      var c = Object.assign({}, s); c.dist = origin ? km(origin, s) : null; return c;
+    });
+    if (origin) items.sort(function (a, b) { return a.dist - b.dist; });
+    listEl.innerHTML = items.map(function (s, i) {
+      var nearest = origin && i === 0;
+      return '<li class="shop' + (nearest ? ' nearest' : '') + '" data-id="' + s.id + '" tabindex="0">' +
+        '<div class="chips">' + (nearest ? '<span class="chip">Closest to you</span>' : '') +
+        (s.demo ? '<span class="chip light">Sample branch</span>' : '') + '</div>' +
+        '<h3>' + s.name + '</h3>' +
+        '<p class="addr">' + s.address + '</p>' +
+        (origin ? '<p class="dist">' + fmt(s.dist) + ' away</p>' : '') +
+        '<div class="actions">' +
+          '<a class="primary" href="' + dirUrl(s) + '" target="_blank" rel="noopener">Get directions</a>' +
+          (s.phone ? '<a href="tel:' + s.phone + '">Call ' + s.phoneLabel + '</a>' : '') +
+          '<button type="button">Show on map</button>' +
+        '</div></li>';
+    }).join('');
+    markNearest(origin ? items[0].id : null);
+    return items;
+  }
+
+  function focusShop(id) {
+    if (!map || !markers[id]) return;
+    var s = shops.filter(function (x) { return x.id === id; })[0];
+    map.flyTo([s.lat, s.lng], 15, { duration: 0.8 });
+    markers[id].openPopup();
+    if (window.innerWidth <= 900) document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function setOrigin(origin, label) {
+    var items = render(origin), n = items[0];
+    say((label ? 'Closest to “' + label + '”: ' : 'Your closest shop is ') +
+        n.name + ', about ' + fmt(n.dist) + ' away.');
+    if (map) {
+      if (youMarker) map.removeLayer(youMarker);
+      youMarker = L.marker([origin.lat, origin.lng], { icon: youIcon, zIndexOffset: 1000, title: 'You' })
+        .addTo(map).bindPopup(label ? label : 'You are here');
+      map.fitBounds([[origin.lat, origin.lng], [n.lat, n.lng]], { padding: [70, 70], maxZoom: 15 });
+    }
+  }
+
+  listEl.addEventListener('click', function (e) {
+    var li = e.target.closest('.shop');
+    if (!li || e.target.closest('a')) return;
+    focusShop(li.getAttribute('data-id'));
+  });
+  listEl.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter') return;
+    var li = e.target.closest('.shop');
+    if (li && e.target === li) focusShop(li.getAttribute('data-id'));
+  });
+
+  locateBtn.addEventListener('click', function () {
+    if (!navigator.geolocation) { say('This browser cannot share your location. Please type your area instead.', true); return; }
+    say('Finding your location…');
+    locateBtn.disabled = true;
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      locateBtn.disabled = false;
+      setOrigin({ lat: pos.coords.latitude, lng: pos.coords.longitude }, null);
+    }, function (err) {
+      locateBtn.disabled = false;
+      say(err && err.code === 1
+        ? 'Location is turned off for this page. Please type your area below instead.'
+        : 'We could not find your location. Please type your area below instead.', true);
+    }, { timeout: 10000, maximumAge: 300000 });
+  });
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var q = input.value.trim();
+    if (!q) { say('Please type a town or area first.', true); input.focus(); return; }
+    say('Searching…');
+    fetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=gh&q=' +
+          encodeURIComponent(q + ', Ghana'), { headers: { 'Accept': 'application/json' } })
+      .then(function (r) { if (!r.ok) throw new Error('bad response'); return r.json(); })
+      .then(function (data) {
+        if (!data.length) { say('We could not find “' + q + '”. Try a nearby town or area.', true); return; }
+        setOrigin({ lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) }, q);
+      })
+      .catch(function () { say('We could not search just now. Check your internet connection and try again.', true); });
+  });
+
+  render(null);
+  initMap();
+  say('Tap “Use my location”, or type your area, to see the shop closest to you.');
+})();
+</script>
+<script src="site.js"></script>
+</body>
+</html>

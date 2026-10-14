@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Beaded Mermaid Gown | Frimbell Collections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=Playfair+Display:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #1a1212;
+    --muted: #5c5252;
+    --paper: #f7f4f1;
+    --card: #f1eeeb;
+    --line: #e3dcd6;
+    --red: #b3202a;
+    --ok: #1f6b3a;
+    --gutter: clamp(16px, 4vw, 48px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: "Inter Tight", system-ui, sans-serif;
+    font-size: 18px; line-height: 1.55; color: var(--ink); background: #fff;
+  }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--red); outline-offset: 3px; }
+
+  /* ---------- NAV (solid version) ---------- */
+  .nav {
+    display: flex; align-items: center; justify-content: space-between;
+    height: 76px; padding: 0 var(--gutter);
+    border-bottom: 1px solid var(--line); background: #fff;
+    position: sticky; top: 0; z-index: 20; font-size: 16px;
+  }
+  .nav .logo { font-weight: 600; font-size: 22px; letter-spacing: -0.01em; text-decoration: none; }
+  .nav ul { display: flex; gap: 32px; list-style: none; }
+  .nav a { text-decoration: none; }
+  .nav ul a:hover, .nav .actions a:hover { text-decoration: underline; text-underline-offset: 5px; }
+  .nav .actions { display: flex; gap: 22px; }
+
+  /* ---------- BREADCRUMB ---------- */
+  .crumbs { padding: 22px var(--gutter) 0; font-size: 15px; color: var(--muted); }
+  .crumbs a { text-decoration: none; }
+  .crumbs a:hover { text-decoration: underline; }
+  .crumbs span[aria-current] { color: var(--ink); }
+
+  /* ---------- PRODUCT ---------- */
+  .product {
+    display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: clamp(28px, 5vw, 72px);
+    padding: 24px var(--gutter) clamp(48px, 6vw, 80px);
+    max-width: 1440px; margin: 0 auto;
+  }
+
+  .gallery { position: sticky; top: 100px; align-self: start; }
+  .main-photo {
+    position: relative; aspect-ratio: 4 / 5; background: var(--card); overflow: hidden;
+  }
+  .main-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
+  .badge {
+    position: absolute; top: 14px; left: 14px; z-index: 2;
+    background: var(--ink); color: #fff; font-size: 13px; letter-spacing: .06em;
+    text-transform: uppercase; padding: 6px 12px;
+  }
+  .thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 12px; }
+  .thumbs button {
+    aspect-ratio: 4 / 5; padding: 0; border: 2px solid transparent; background: var(--card);
+    cursor: pointer; overflow: hidden;
+  }
+  .thumbs button[aria-current="true"] { border-color: var(--ink); }
+  .thumbs img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 15%; }
+
+  .details h1 { font-size: clamp(2rem, 3.4vw, 2.8rem); font-weight: 500; letter-spacing: -0.025em; line-height: 1.08; }
+  .rating { display: flex; align-items: center; gap: 10px; margin-top: 12px; font-size: 16px; color: var(--muted); }
+  .stars { color: #c98a12; letter-spacing: 2px; font-size: 18px; }
+  .short { margin-top: 14px; color: var(--muted); max-width: 52ch; }
+  .price-row { display: flex; align-items: baseline; gap: 14px; margin-top: 18px; }
+  .price { font-size: 2rem; font-weight: 600; letter-spacing: -0.02em; }
+  .was { color: var(--muted); text-decoration: line-through; font-size: 1.1rem; }
+  .stock { margin-top: 8px; font-size: 16px; color: var(--ok); font-weight: 500; }
+
+  .field { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); }
+  .field-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 14px; }
+  .field-head .label { font-weight: 600; font-size: 17px; }
+  .field-head .label span { font-weight: 400; color: var(--muted); }
+  .link-btn { background: none; border: 0; padding: 4px 0; text-decoration: underline; text-underline-offset: 4px; cursor: pointer; font-size: 16px; }
+
+  .swatches { display: flex; gap: 14px; flex-wrap: wrap; }
+  .swatch {
+    width: 44px; height: 44px; border-radius: 50%; border: 2px solid #fff;
+    box-shadow: 0 0 0 1.5px var(--line); cursor: pointer; padding: 0;
+  }
+  .swatch[aria-checked="true"] { box-shadow: 0 0 0 2.5px var(--ink); }
+
+  .sizes { display: flex; gap: 10px; flex-wrap: wrap; }
+  .size {
+    min-width: 56px; height: 52px; padding: 0 14px; background: #fff;
+    border: 1.5px solid var(--line); cursor: pointer; font-size: 17px; font-weight: 500;
+  }
+  .size:hover { border-color: var(--ink); }
+  .size[aria-checked="true"] { background: var(--ink); color: #fff; border-color: var(--ink); }
+  .size[disabled] { color: #b5acac; text-decoration: line-through; cursor: not-allowed; border-style: dashed; }
+  .error { color: var(--red); font-size: 16px; margin-top: 10px; min-height: 1.4em; }
+  .fit-note { margin-top: 12px; font-size: 16px; color: var(--muted); }
+
+  .buy { display: grid; grid-template-columns: 150px 1fr; gap: 12px; margin-top: 8px; }
+  .qty { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid var(--ink); height: 58px; }
+  .qty button { width: 48px; height: 100%; border: 0; background: none; font-size: 22px; cursor: pointer; }
+  .qty output { font-weight: 600; font-size: 18px; }
+  .add-btn {
+    height: 58px; border: 0; background: var(--ink); color: #fff; font-size: 17px; font-weight: 500;
+    letter-spacing: .04em; cursor: pointer; transition: background .2s;
+  }
+  .add-btn:hover { background: #3a2a2a; }
+  .add-btn.done { background: var(--ok); }
+
+  .secondary { display: flex; gap: 28px; margin-top: 18px; flex-wrap: wrap; }
+  .secondary button, .secondary a {
+    background: none; border: 0; padding: 6px 0; cursor: pointer; font-size: 16px; font-weight: 500;
+    text-decoration: none; display: inline-flex; align-items: center; gap: 8px;
+  }
+  .secondary button:hover, .secondary a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .heart-ico { width: 20px; height: 20px; fill: none; stroke: var(--ink); stroke-width: 1.8; }
+  #wish[aria-pressed="true"] .heart-ico { fill: var(--red); stroke: var(--red); }
+
+  .perks { margin-top: 26px; display: grid; gap: 10px; padding: 20px; background: var(--paper); font-size: 16px; }
+  .perks div { display: flex; gap: 12px; }
+  .perks b { font-weight: 600; min-width: 130px; }
+
+  .meta { margin-top: 24px; font-size: 15px; color: var(--muted); display: grid; grid-template-columns: 90px 1fr; gap: 6px 12px; }
+  .meta dt { font-weight: 500; }
+
+  /* ---------- TABS ---------- */
+  .info { background: var(--paper); padding: clamp(40px, 6vw, 80px) var(--gutter); }
+  .info-inner { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: 220px 1fr; gap: 40px; }
+  .tablist { display: flex; flex-direction: column; gap: 4px; }
+  .tab {
+    text-align: left; background: none; border: 0; padding: 10px 0; cursor: pointer;
+    font-size: 18px; color: var(--muted); border-left: 3px solid transparent; padding-left: 14px;
+  }
+  .tab[aria-selected="true"] { color: var(--ink); font-weight: 600; border-left-color: var(--ink); }
+  .panel h2 { font-size: 1.4rem; font-weight: 500; margin-bottom: 14px; }
+  .panel p { color: var(--muted); max-width: 64ch; margin-bottom: 18px; }
+  .panel ul { padding-left: 22px; color: var(--ink); }
+  .panel li { margin-bottom: 8px; }
+  .panel[hidden] { display: none; }
+  .table { width: 100%; max-width: 560px; border-collapse: collapse; font-size: 17px; }
+  .table th, .table td { text-align: left; padding: 12px 10px; border-bottom: 1px solid var(--line); }
+  .table th { width: 40%; font-weight: 500; color: var(--muted); }
+  .review { padding: 16px 0; border-bottom: 1px solid var(--line); max-width: 64ch; }
+  .review b { display: block; }
+
+  /* ---------- RELATED ---------- */
+  .related { padding: clamp(40px, 6vw, 80px) var(--gutter); }
+  .related .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+  .related h2 { font-size: clamp(1.6rem, 2.6vw, 2.2rem); font-weight: 500; letter-spacing: -0.02em; }
+  .arrows { display: flex; gap: 10px; }
+  .arrows button {
+    width: 48px; height: 48px; border-radius: 50%; border: 1.5px solid var(--ink); background: #fff;
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .arrows svg { width: 20px; height: 20px; stroke: var(--ink); fill: none; stroke-width: 2; }
+  .arrows .prev svg { transform: rotate(180deg); }
+  .rel-track {
+    display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, calc((100% - 3 * 20px) / 4));
+    gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 10px;
+    scrollbar-width: thin;
+  }
+  .rel-card { scroll-snap-align: start; text-decoration: none; display: block; }
+  .rel-card .ph { aspect-ratio: 4 / 5; background: var(--card); overflow: hidden; }
+  .rel-card img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s; }
+  .rel-card:hover img { transform: scale(1.03); }
+  .rel-card h3 { font-size: 18px; font-weight: 500; margin-top: 12px; }
+  .rel-card .p { font-size: 18px; font-weight: 600; }
+
+  /* ---------- SIZE GUIDE DIALOG ---------- */
+  dialog { border: 0; padding: 0; max-width: 620px; width: calc(100% - 32px); margin: auto; }
+  dialog::backdrop { background: rgba(20,8,8,.55); }
+  .dlg { padding: 28px; }
+  .dlg-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .dlg h2 { font-size: 1.5rem; font-weight: 500; }
+  .dlg .close { width: 44px; height: 44px; border: 0; background: var(--paper); font-size: 22px; cursor: pointer; border-radius: 50%; }
+  .dlg p { color: var(--muted); font-size: 16px; margin-bottom: 16px; }
+  .dlg table { width: 100%; border-collapse: collapse; font-size: 17px; }
+  .dlg th, .dlg td { padding: 10px; border-bottom: 1px solid var(--line); text-align: left; }
+  .dlg th { font-weight: 600; background: var(--paper); }
+
+  /* ---------- FOOTER ---------- */
+  .footer {
+    position: relative; color: #fff;
+    padding: clamp(60px, 9vw, 110px) var(--gutter) clamp(24px, 3vw, 40px);
+    background: #3a2222 url("footer-bg.jpg") center / cover no-repeat;
+  }
+  .footer::before { content: ""; position: absolute; inset: 0; background: rgba(20,8,8,.35); }
+  .footer > * { position: relative; }
+  .foot-card {
+    background: rgba(255,255,255,.96); color: var(--ink); border-radius: 14px;
+    padding: clamp(24px, 3.5vw, 44px);
+    display: grid; grid-template-columns: 1.6fr 1fr 1fr 1fr; gap: 32px;
+  }
+  .foot-card .brand { font-size: 24px; font-weight: 600; }
+  .foot-card .brand-text { margin-top: 12px; font-size: 16px; color: var(--muted); max-width: 36ch; }
+  .foot-card .social { display: flex; gap: 18px; margin-top: 20px; font-size: 15px; font-weight: 500; }
+  .foot-card h4 { font-size: 15px; font-weight: 500; color: var(--muted); margin-bottom: 14px; }
+  .foot-card ul { list-style: none; }
+  .foot-card li { margin-bottom: 10px; }
+  .foot-card li a { text-decoration: none; font-size: 17px; }
+  .foot-card li a:hover { text-decoration: underline; text-underline-offset: 4px; }
+  .copyright { margin-top: 20px; text-align: center; font-size: 14px; opacity: .85; }
+
+  /* ---------- RESPONSIVE ---------- */
+  @media (max-width: 900px) {
+    .product { grid-template-columns: 1fr; }
+    .gallery { position: static; }
+    .info-inner { grid-template-columns: 1fr; gap: 20px; }
+    .tablist { flex-direction: row; flex-wrap: wrap; gap: 4px 18px; }
+    .tab { border-left: 0; border-bottom: 3px solid transparent; padding-left: 0; }
+    .tab[aria-selected="true"] { border-bottom-color: var(--ink); }
+    .rel-track { grid-auto-columns: minmax(200px, 44%); }
+    .foot-card { grid-template-columns: 1fr 1fr; }
+    .foot-card > div:first-child { grid-column: 1 / -1; }
+  }
+  @media (max-width: 640px) {
+    body { font-size: 17px; }
+    .nav ul { display: none; }
+    .buy { grid-template-columns: 1fr; }
+    .rel-track { grid-auto-columns: 70%; }
+    .arrows { display: none; }
+    .perks div { flex-direction: column; gap: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+
+  /* wordmark (text version of the storefront logo) */
+  .wm { display: inline-flex; align-items: baseline; gap: .3em; white-space: nowrap; }
+  .wm b { font-weight: 700; letter-spacing: .03em; }
+  .wm i { font-family: "Playfair Display", Georgia, serif; font-style: italic; font-weight: 500; font-size: .92em; }
+
+  .foot-card .contact { margin-top: 18px; font-size: 16px; line-height: 1.7; color: var(--muted); max-width: 36ch; }
+  .foot-card .contact a { color: var(--ink); text-decoration: none; white-space: nowrap; }
+  .foot-card .contact a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+  /* footer: soft, blurred photo behind the card */
+  .footer { background: #3a2222; overflow: hidden; }
+  .footer::before {
+    inset: -24px;
+    background: linear-gradient(rgba(20,8,8,.5), rgba(20,8,8,.6)), url("footer-bg.jpg") center / cover no-repeat;
+    filter: blur(7px);
+  }
+  .thumbs { grid-template-columns: repeat(3, 1fr); }
+  .nav .logo { background: var(--ink); color: var(--logo-yellow); padding: 8px 16px; }
+  .main-photo img { cursor: zoom-in; }
+</style>
+<link rel="stylesheet" href="site.css">
+</head>
+<body>
+
+  <header class="nav">
+    <a class="logo" href="index.html"><span class="wm"><b>FRIMBELL</b><i>Collections</i></span></a>
+    <ul>
+      <li><a href="index.html#new">New In</a></li>
+      <li><a href="product.html">Shop</a></li>
+      <li><a href="index.html#stores">Find a shop</a></li>
+      <li><a href="index.html#about">About</a></li>
+      <li><a href="index.html#contact">Contact</a></li>
+    </ul>
+    <div class="actions">
+      <a href="#" data-bag>Bag (<span data-bag-count>0</span>)</a>
+    </div>
+  </header>
+
+  <nav class="crumbs" aria-label="Breadcrumb">
+    <a href="index.html">Home</a> / <a href="#">Gowns</a> / <span aria-current="page">Beaded Mermaid Gown</span>
+  </nav>
+
+  <!-- ================= PRODUCT ================= -->
+  <main>
+    <section class="product">
+      <div class="gallery">
+        <div class="main-photo">
+          <span class="badge">New</span>
+          <img id="main-img" src="product-1.jpg" alt="Beaded Mermaid Gown, front view">
+        </div>
+        <div class="thumbs" role="group" aria-label="Product photos">
+          <button aria-current="true" data-src="product-1.jpg" data-alt="Beaded Mermaid Gown, front view"><img src="product-1.jpg" alt="Front view"></button>
+          <button data-src="product-1-b.jpg" data-alt="Beaded Mermaid Gown, back view"><img src="product-1-b.jpg" alt="Back view"></button>
+          <button data-src="product-1-c.jpg" data-alt="Beaded Mermaid Gown, beadwork detail"><img src="product-1-c.jpg" alt="Beadwork detail"></button>
+        </div>
+      </div>
+
+      <div class="details">
+        <h1>Beaded Mermaid Gown</h1>
+        <div class="rating"><span class="stars" aria-hidden="true">★★★★★</span><span>4.9 (23 reviews)</span></div>
+        <p class="short">A fitted gown with hand-placed beadwork and sheer sleeves, made for evenings you want to remember.</p>
+        <div class="price-row"><span class="price">GH₵ 2,450</span><span class="was">GH₵ 2,900</span></div>
+        <p class="stock">In stock, ships in 3 to 5 days</p>
+
+        <div class="field">
+          <div class="field-head"><span class="label">Colour: <span id="color-name">Red</span></span></div>
+          <div class="swatches" role="radiogroup" aria-label="Colour">
+            <button class="swatch" role="radio" aria-checked="true" aria-label="Red" data-name="Red" style="background:#c8202b"></button>
+            <button class="swatch" role="radio" aria-checked="false" aria-label="Blush pink" data-name="Blush pink" style="background:#f0c5cf"></button>
+            <button class="swatch" role="radio" aria-checked="false" aria-label="Champagne" data-name="Champagne" style="background:#e4cf9f"></button>
+            <button class="swatch" role="radio" aria-checked="false" aria-label="Black" data-name="Black" style="background:#1a1212"></button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-head">
+            <span class="label">Size (UK): <span id="size-name">Select a size</span></span>
+            <button class="link-btn" id="open-guide">Size guide</button>
+          </div>
+          <div class="sizes" role="radiogroup" aria-label="Size">
+            <button class="size" role="radio" aria-checked="false">8</button>
+            <button class="size" role="radio" aria-checked="false">10</button>
+            <button class="size" role="radio" aria-checked="false">12</button>
+            <button class="size" role="radio" aria-checked="false">14</button>
+            <button class="size" role="radio" aria-checked="false">16</button>
+            <button class="size" role="radio" aria-checked="false">18</button>
+            <button class="size" role="radio" aria-checked="false" disabled aria-label="20, sold out">20</button>
+          </div>
+          <p class="error" id="size-error" role="alert"></p>
+          <p class="fit-note">Between sizes, or want a perfect fit? <a href="https://wa.me/233244665883?text=Hello%20Frimbell%20Collections%2C%20I%20would%20like%20the%20Beaded%20Mermaid%20Gown%20made%20to%20measure." target="_blank" rel="noopener">Order made to measure</a>.</p>
+        </div>
+
+        <div class="field">
+          <div class="buy">
+            <div class="qty" role="group" aria-label="Quantity">
+              <button id="minus" aria-label="Decrease quantity">−</button>
+              <output id="qty" aria-live="polite">1</output>
+              <button id="plus" aria-label="Increase quantity">+</button>
+            </div>
+            <button class="add-btn" id="add">Add to bag</button>
+          </div>
+          <div class="secondary">
+            <button id="wish" aria-pressed="false">
+              <svg class="heart-ico" viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.5-9.2C1.2 8.6 3 5.5 6.2 5.5c2 0 3.2 1.1 3.8 2.2.6-1.1 1.8-2.2 3.8-2.2 3.2 0 5 3.1 3.7 6.3C19.5 16.4 12 21 12 21z"/></svg>
+              Save to wishlist
+            </button>
+            <a href="https://wa.me/233244665883?text=Hello%20Frimbell%20Collections%2C%20I%20have%20a%20question%20about%20the%20Beaded%20Mermaid%20Gown." target="_blank" rel="noopener">Ask a question on WhatsApp</a>
+            <button id="share">Share</button>
+          </div>
+        </div>
+
+        <div class="perks">
+          <div><b>Delivery</b><span>Accra 1 to 2 days. Nationwide 3 to 5 days.</span></div>
+          <div><b>Returns</b><span>Free exchange within 7 days if it doesn't fit.</span></div>
+          <div><b>Payment</b><span>Mobile money, card or pay on delivery.</span></div>
+        </div>
+
+        <dl class="meta">
+          <dt>SKU</dt><dd>BMG-001</dd>
+          <dt>Category</dt><dd>Gowns, Occasion wear</dd>
+          <dt>Tags</dt><dd>Beaded, Evening, Wedding guest</dd>
+        </dl>
+      </div>
+    </section>
+
+    <!-- ================= TABS ================= -->
+    <section class="info">
+      <div class="info-inner">
+        <div class="tablist" role="tablist" aria-label="Product information">
+          <button class="tab" role="tab" id="t1" aria-controls="p1" aria-selected="true">Description</button>
+          <button class="tab" role="tab" id="t2" aria-controls="p2" aria-selected="false">Fabric &amp; care</button>
+          <button class="tab" role="tab" id="t3" aria-controls="p3" aria-selected="false">Reviews (23)</button>
+          <button class="tab" role="tab" id="t4" aria-controls="p4" aria-selected="false">Questions</button>
+        </div>
+
+        <div>
+          <div class="panel" role="tabpanel" id="p1" aria-labelledby="t1">
+            <h2>About this piece</h2>
+            <p id="long-desc">A fitted mermaid silhouette in stretch satin, finished with hand-placed crystal beadwork and sheer cape sleeves. Made to order in Accra by our own tailors.</p>
+            <ul id="bullets">
+              <li>Fitted through the body, flared at the hem</li>
+              <li>Sheer sleeves with hand-placed beadwork</li>
+              <li>Zip closure at the back, fully lined</li>
+              <li>Model is 5'9" and wears a UK 12</li>
+            </ul>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>
+            <h2>Fabric &amp; care</h2>
+            <table class="table" id="fabric-table">
+              <tr><th>Fabric</th><td>Stretch satin with beaded tulle</td></tr>
+              <tr><th>Lining</th><td>Soft stretch lining</td></tr>
+              <tr><th>Fit</th><td>Fitted, true to size</td></tr>
+              <tr><th>Care</th><td>Dry clean only</td></tr>
+            </table>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>
+            <h2>What customers say</h2>
+            <div class="review"><span class="stars" aria-hidden="true">★★★★★</span><b>Abena K., Dansoman</b><p>I wore this to my daughter's wedding and received compliments all evening. The fit was perfect and it was very comfortable to sit in.</p></div>
+            <div class="review"><span class="stars" aria-hidden="true">★★★★★</span><b>Mrs. Owusu, East Legon</b><p>Beautiful beadwork and the tailors were patient with my adjustments. It was ready before the date they promised.</p></div>
+            <div class="review"><span class="stars" aria-hidden="true">★★★★☆</span><b>Efua M., Kumasi</b><p>Lovely gown, delivery to Kumasi took four days. I would order again.</p></div>
+          </div>
+
+          <div class="panel" role="tabpanel" id="p4" aria-labelledby="t4" hidden>
+            <h2>Have a question?</h2>
+            <p>Ask about sizing, fabric, delivery or custom orders. We reply on WhatsApp, usually within the hour.</p>
+            <a class="link-btn" href="https://wa.me/233244665883?text=Hello%20Frimbell%20Collections%2C%20I%20have%20a%20question." target="_blank" rel="noopener">Message us on WhatsApp</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= RELATED ================= -->
+    <section class="related" aria-labelledby="rel-title">
+      <div class="head">
+        <h2 id="rel-title">You might also like</h2>
+        <div class="arrows">
+          <button class="prev" aria-label="Previous"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+          <button class="next" aria-label="Next"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+        </div>
+      </div>
+      <div class="rel-track" id="rel-track" tabindex="0" aria-label="Related pieces">
+        </div>
+    </section>
+  </main>
+
+  <!-- ================= SIZE GUIDE ================= -->
+  <dialog id="guide" aria-labelledby="guide-title">
+    <div class="dlg">
+      <div class="dlg-head">
+        <h2 id="guide-title">Size guide</h2>
+        <button class="close" id="close-guide" aria-label="Close size guide">×</button>
+      </div>
+      <p>All measurements are in inches. Measure over light clothing and choose the size closest to your bust and hips.</p>
+      <table>
+        <thead><tr><th>UK size</th><th>Bust</th><th>Waist</th><th>Hips</th></tr></thead>
+        <tbody>
+          <tr><td>8</td><td>34</td><td>27</td><td>37</td></tr>
+          <tr><td>10</td><td>36</td><td>29</td><td>39</td></tr>
+          <tr><td>12</td><td>38</td><td>31</td><td>41</td></tr>
+          <tr><td>14</td><td>40</td><td>33</td><td>43</td></tr>
+          <tr><td>16</td><td>42</td><td>35</td><td>45</td></tr>
+          <tr><td>18</td><td>44</td><td>37</td><td>47</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </dialog>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    <div class="foot-card">
+      <div>
+        <div class="brand"><span class="wm"><b>FRIMBELL</b><i>Collections</i></span></div>
+        <p class="brand-text">Elegant occasion wear for women who love to look and feel their best.</p>
+        <div class="social"><a href="https://www.instagram.com/frimbell_luxury_collections/" target="_blank" rel="noopener">Instagram</a><a href="https://wa.me/233244665883?text=Hello%20Frimbell%20Collections%2C%20I%20would%20like%20to%20ask%20about%20an%20order." target="_blank" rel="noopener">WhatsApp</a></div>
+        <p class="contact">Dansoman first roundabout, opposite Absa Bank, Accra, Ghana<br><a href="tel:+233244665883">024 466 5883</a> · <a href="tel:+233533062065">053 306 2065</a> · <a href="tel:+233500625824">050 062 5824</a></p>
+      </div>
+      <div><h4>Shop</h4><ul><li><a href="index.html#new">New in</a></li><li><a href="#">Gowns</a></li><li><a href="#">Two-piece sets</a></li><li><a href="#">Accessories</a></li></ul></div>
+      <div><h4>Company</h4><ul><li><a href="index.html#about">About us</a></li><li><a href="#">Custom orders</a></li><li><a href="index.html#stores">Showroom</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="#">Size guide</a></li><li><a href="#">Delivery</a></li><li><a href="#">Returns</a></li><li><a href="index.html#contact">Contact us</a></li></ul></div>
+    </div>
+    <p class="copyright">&copy; 2026 Frimbell Collections. All rights reserved.</p>
+  </footer>
+
+<script src="site.js"></script>
+<script>
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  const mainImg = $('#main-img');
+  // ---- fill the page from the chosen piece (dummy data lives in site.js) ----
+  const params = new URLSearchParams(location.search);
+  const P = FrimbellCart.byId(params.get('id')) || FrimbellCart.PRODUCTS[0];
+  const M = FrimbellCart.money;
+  document.title = P.name + ' | Frimbell Collections';
+  $('.details h1').textContent = P.name;
+  $('.crumbs span').textContent = P.name;
+  $('.rating span:last-child').textContent = P.rating;
+  $('#t3').textContent = 'Reviews (' + P.reviews + ')';
+  $('.short').textContent = P.short;
+  $('.price-row').innerHTML = '<span class="price">' + M(P.price) + '</span>' + (P.was ? '<span class="was">' + M(P.was) + '</span>' : '');
+  const badge = $('.badge'); if (P.tag) badge.textContent = P.tag; else badge.hidden = true;
+  $('#long-desc').textContent = P.long;
+  $('#bullets').innerHTML = P.bullets.map(b => '<li>' + b + '</li>').join('');
+  $('#fabric-table').innerHTML = Object.keys(P.fabric).map(k => '<tr><th>' + k + '</th><td>' + P.fabric[k] + '</td></tr>').join('');
+  const dds = $$('.meta dd'); dds[0].textContent = P.sku; dds[1].textContent = P.category; dds[2].textContent = P.tags;
+  $('.thumbs').innerHTML = P.photos.map((src, i) => '<button ' + (i === 0 ? 'aria-current="true" ' : '') + 'data-src="' + src + '" data-alt="' + P.name + ', ' + P.photoAlts[i].toLowerCase() + '"><img src="' + src + '" alt="' + P.photoAlts[i] + '"></button>').join('');
+  $('.thumbs').style.gridTemplateColumns = 'repeat(' + P.photos.length + ',1fr)';
+  mainImg.src = P.photos[0]; mainImg.alt = P.name + ', ' + P.photoAlts[0].toLowerCase();
+  $('.swatches').innerHTML = P.colours.map((c, i) => '<button class="swatch" role="radio" aria-checked="' + (i === 0) + '" aria-label="' + c + '" data-name="' + c + '" style="background:' + FrimbellCart.hex(c) + '"></button>').join('');
+  $('#color-name').textContent = P.colours[0];
+  const enc = t => encodeURIComponent(t);
+  $('.fit-note a').href = FrimbellCart.wa('Hello Frimbell Collections, I would like the ' + P.name + ' made to measure.');
+  $('.secondary a').href = FrimbellCart.wa('Hello Frimbell Collections, I have a question about the ' + P.name + '.');
+  $('#rel-track').innerHTML = FrimbellCart.PRODUCTS.filter(x => x.id !== P.id).map(x =>
+    '<a class="rel-card" href="product.html?id=' + x.id + '"><div class="ph"><img src="' + x.photos[0] + '" alt="" loading="lazy"></div><h3>' + x.name + '</h3><span class="p">' + M(x.price) + (x.was ? ' <s style="font-weight:400;color:var(--muted);font-size:15px">' + M(x.was) + '</s>' : '') + '</span></a>').join('');
+
+  // photo zoom
+  const lb = document.createElement('dialog'); lb.id = 'lightbox';
+  lb.innerHTML = '<div class="lb"><button class="lb-close" aria-label="Close photo">×</button><img alt=""><p class="lb-hint">Tap anywhere to close</p></div>';
+  document.body.appendChild(lb);
+  mainImg.addEventListener('click', () => { const i = lb.querySelector('img'); i.src = mainImg.src; i.alt = mainImg.alt; lb.showModal(); });
+  lb.addEventListener('click', () => lb.close());
+  $('.main-photo').insertAdjacentHTML('afterend', '<p class="zoom-hint">Tap the photo to see it larger</p>');
+
+  // gallery thumbnails
+  $('.thumbs').addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    mainImg.src = b.dataset.src;
+    mainImg.alt = b.dataset.alt;
+    $$('.thumbs button').forEach(x => x.setAttribute('aria-current', 'false'));
+    b.setAttribute('aria-current', 'true');
+  });
+
+  // colour
+  $('.swatches').addEventListener('click', e => {
+    const s = e.target.closest('.swatch'); if (!s) return;
+    $$('.swatch').forEach(x => x.setAttribute('aria-checked', 'false'));
+    s.setAttribute('aria-checked', 'true');
+    $('#color-name').textContent = s.dataset.name;
+  });
+
+  // size
+  let size = null;
+  $$('.size:not([disabled])').forEach(s => s.addEventListener('click', () => {
+    $$('.size').forEach(x => x.setAttribute('aria-checked', 'false'));
+    s.setAttribute('aria-checked', 'true');
+    size = s.textContent.trim();
+    $('#size-name').textContent = size;
+    $('#size-error').textContent = '';
+  }));
+
+  // quantity
+  let qty = 1;
+  const qtyEl = $('#qty');
+  $('#minus').addEventListener('click', () => { qty = Math.max(1, qty - 1); qtyEl.textContent = qty; });
+  $('#plus').addEventListener('click', () => { qty = Math.min(10, qty + 1); qtyEl.textContent = qty; });
+
+  // add to bag (shared bag, saved in the browser)
+  const addBtn = $('#add');
+  addBtn.addEventListener('click', () => {
+    if (!size) {
+      $('#size-error').textContent = 'Please choose a size first.';
+      $('.sizes').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    const sw = $('.swatch[aria-checked="true"]');
+    FrimbellCart.add({ id: P.id, name: P.name, price: P.price, size, colour: sw ? sw.dataset.name : '', qty, img: P.photos[0] });
+    addBtn.textContent = 'Added to bag ✓';
+    addBtn.classList.add('done');
+    setTimeout(() => { addBtn.textContent = 'Add to bag'; addBtn.classList.remove('done'); }, 1800);
+  });
+
+  // wishlist + share
+  $('#wish').addEventListener('click', e => {
+    const b = e.currentTarget;
+    b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true'));
+  });
+  $('#share').addEventListener('click', async () => {
+    try {
+      if (navigator.share) await navigator.share({ title: document.title, url: location.href });
+      else { await navigator.clipboard.writeText(location.href); $('#share').textContent = 'Link copied'; }
+    } catch (_) {}
+  });
+
+  // size guide dialog
+  const dlg = $('#guide');
+  $('#open-guide').addEventListener('click', () => dlg.showModal());
+  $('#close-guide').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('click', e => { if (e.target === dlg) dlg.close(); });
+
+  // tabs
+  const tabs = $$('.tab');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => {
+      const on = x === t;
+      x.setAttribute('aria-selected', String(on));
+      $('#' + x.getAttribute('aria-controls')).hidden = !on;
+    });
+  }));
+
+  // related arrows
+  const rel = $('#rel-track');
+  const relStep = () => rel.querySelector('.rel-card').getBoundingClientRect().width + 20;
+  $('.arrows .next').addEventListener('click', () => rel.scrollBy({ left: relStep(), behavior: 'smooth' }));
+  $('.arrows .prev').addEventListener('click', () => rel.scrollBy({ left: -relStep(), behavior: 'smooth' }));
+</script>
+<script>
+  // hide any photo that is not in the folder yet, so there are no broken-image icons
+  document.querySelectorAll('img').forEach(img => {
+    const hide = () => {
+      img.style.visibility = 'hidden';
+      const t = img.closest('.thumbs button'); if (t) t.hidden = true;
+    };
+    if (img.complete && img.naturalWidth === 0) hide();
+    img.addEventListener('error', hide);
+  });
+</script>
+</body>
+</html>
