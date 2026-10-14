@@ -101,3 +101,7 @@ html.bag-open { overflow: hidden; }
 .rel-card .p s { margin-left: 6px; }
 .card .info { flex: 1; display: flex; flex-direction: column; }
 .card .row { margin-top: auto; padding-top: 12px; }
+
+/* hide the scrollbar under the new-arrivals row (the arrow buttons still scroll it) */
+.track, .rel-track { scrollbar-width: none; -ms-overflow-style: none; }
+.track::-webkit-scrollbar, .rel-track::-webkit-scrollbar { display: none; }
